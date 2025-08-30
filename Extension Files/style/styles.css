@@ -1,0 +1,39 @@
+body{
+    background-color: #ffffff;
+    font-family: Verdana, Arial, Tahoma, Serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.6;
+    margin: 0;
+    padding: 10px;
+}
+
+.container{
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+p{
+    font-family: Verdana, Arial, Tahoma, Serif;
+    font-weight: 500;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+/* Additional styles for better Consolas appearance */
+h1, h2, h3, h4, h5, h6 {
+    font-family: Verdana, Arial, Tahoma, Serif;
+    font-weight: 600;
+}
+
+input, button, textarea {
+    font-family: Verdana, Arial, Tahoma, Serif;
+    font-size: 12px;
+}
+
+#chat-container, #chat-prompt, #link-container {
+    font-family: Verdana, Arial, Tahoma, Serif;
+    font-size: 12px;
+    line-height: 1.5;
+}
