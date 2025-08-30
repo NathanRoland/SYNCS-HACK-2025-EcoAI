@@ -1,149 +1,103 @@
-import os
-import asyncio
-from serpapi import GoogleSearch
-from langchain_openai import ChatOpenAI
-from langchain.agents import create_openai_functions_agent, AgentExecutor
-from langchain.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.schema import SystemMessage
-from langchain.tools import Tool
-from dotenv import load_dotenv
+from langchain.tools import BaseTool
+from pydantic import BaseModel, Field
+from typing import Type, Dict, Any, List, Optional
+import requests
+from bs4 import BeautifulSoup
+import re
+from urllib.parse import urlparse
 
-# Load environment variables
-load_dotenv()
+class ProductScraperInput(BaseModel):
+    """Input for product scraper tool."""
+    url: str = Field(description="Product URL to scrape (Amazon, eBay, Temu, etc.)")
 
-def serpapi_search(query):
-    """Search using SerpAPI (Google Search)"""
-    try:
-        params = {
-            "q": query,
-            "api_key": os.getenv("SERPAPI_KEY"),
-            "engine": "google",
-            "num": 5
-        }
-        search = GoogleSearch(params)
-        results = search.get_dict()
-        
-        # Format search results
-        formatted_results = []
-        for item in results.get("organic_results", []):
-            formatted_results.append(
-                f"Title: {item.get('title', '')}\n"
-                f"Snippet: {item.get('snippet', '')}\n"
-                f"Link: {item.get('link', '')}\n"
+class ProductScraperTool(BaseTool):
+    """A general product scraper tool using ScrapingBee service."""
+    
+    name: str = "product_scraper"
+    description: str = "Scrapes product information from e-commerce websites including Amazon, eBay, and Temu."
+    args_schema: Type[BaseModel] = ProductScraperInput
+    api_key: str = Field(...)
+    
+    def _run(self, url: str) -> Dict[str, Any]:
+        """Execute the scraping operation."""
+        try:
+            # Auto-detect site type
+            domain = urlparse(url).netloc.lower()
+            if "amazon." in domain:
+                site_type = "amazon"
+            elif "ebay." in domain:
+                site_type = "ebay" 
+            elif "temu." in domain:
+                site_type = "temu"
+            else:
+                site_type = "generic"
+            
+            # Get HTML using ScrapingBee
+            response = requests.get(
+                url='https://app.scrapingbee.com/api/v1',
+                params={
+                    'api_key': self.api_key,
+                    'url': url,
+                    'render_js': 'false'
+                }
             )
+            
+            if response.status_code != 200:
+                return {"error": f"ScrapingBee error: {response.status_code}", "url": url}
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Extract based on site type
+            if site_type == "amazon":
+                return self._extract_amazon(soup, url)
+            else:
+                return {"error": f"{site_type} not implemented yet", "url": url}
+                
+        except Exception as e:
+            return {"error": f"Scraping failed: {str(e)}", "url": url}
+    
+    def _extract_amazon(self, soup: BeautifulSoup, url: str) -> Dict[str, Any]:
+        """Extract Amazon product info."""
+        result = {"title": "N/A", "price": "N/A", "about_item": [], "url": url}
         
-        return "\n".join(formatted_results[:5])
+        # Get title
+        title = soup.find('span', {'id': 'productTitle'})
+        if title:
+            result["title"] = title.get_text(strip=True)
         
-    except Exception as e:
-        return f"Search error: {str(e)}. Using AI knowledge instead."
-
-# Custom SerpAPI search tool for LangChain
-class SerpAPISearchTool(Tool):
-    def __init__(self):
-        super().__init__(
-            name="google_search",
-            description="Search Google for current information about eco-friendly products, sustainable alternatives, and environmental certifications",
-            func=self._search
-        )
-    
-    def _search(self, query: str) -> str:
-        api_key = os.getenv("SERPAPI_KEY")
-        if not api_key:
-            return "SerpAPI key not found. Please add SERPAPI_KEY to your .env file. Using AI knowledge instead."
-        return serpapi_search(query)
-
-# Replace the search tool
-search_tool = SerpAPISearchTool()
-
-# Rest of your code stays the same...
-
-def create_eco_search_agent():
-    """Create an agent that can search for eco-friendly products"""
-    
-    # Initialize LLM with API key from .env
-    llm = ChatOpenAI(
-        api_key=os.getenv("OPENAI_API_KEY"),
-        model="gpt-3.5-turbo",
-        temperature=0.1
-    )
-    
-    # Define the system prompt
-    system_prompt = """Find 3 Amazon eco-alternatives. Format:
-    - Product: Price - Benefit - Link
-    Keep it brief."""
-    
-    # Create prompt template
-    prompt = ChatPromptTemplate.from_messages([
-        SystemMessage(content=system_prompt),
-        MessagesPlaceholder(variable_name="chat_history", optional=True),
-        ("human", "{input}"),
-        MessagesPlaceholder(variable_name="agent_scratchpad")
-    ])
-    
-    # Create agent with search tool
-    agent = create_openai_functions_agent(
-        llm=llm,
-        tools=[search_tool],
-        prompt=prompt
-    )
-    
-    # Create executor
-    agent_executor = AgentExecutor(
-        agent=agent,
-        tools=[search_tool],
-        verbose=True,
-        return_intermediate_steps=True,
-        max_iterations=3,
-        early_stopping_method="generate"
-    )
-    
-    return agent_executor
-
-async def find_eco_alternatives(product_info: dict):
-    """Main function to find eco alternatives"""
-    
-    # Create agent
-    agent_executor = create_eco_search_agent()
-    
-    # Format input for the agent
-    input_text = f"""
-    Product: {product_info['title']}
-    Price: {product_info['price']}
-    Category: {product_info['category']}
-    Description: {product_info.get('description', 'N/A')}
-    
-    Please search for eco-friendly alternatives to this product and provide detailed recommendations.
-    """
-    
-    try:
-        # Run the agent
-        result = await agent_executor.ainvoke({"input": input_text})
+        # Get price
+        price = soup.find('span', {'class': 'a-offscreen'})
+        if price:
+            result["price"] = price.get_text(strip=True)
         
-        return {
-            "success": True,
-            "alternatives": result["output"],
-            "search_steps": result.get("intermediate_steps", [])
-        }
+        # Get about this item
+        about_headers = soup.find_all('h1', string=re.compile(r'About this item', re.IGNORECASE))
+        for header in about_headers:
+            ul_element = header.find_next('ul', class_='a-unordered-list')
+            if ul_element:
+                bullet_points = []
+                for li in ul_element.find_all('li'):
+                    span = li.find('span', class_='a-list-item')
+                    if span:
+                        text = span.get_text(strip=True)
+                        if text and len(text) > 20:
+                            bullet_points.append(text)
+                if bullet_points:
+                    result["about_item"] = bullet_points
+                    break
         
-    except Exception as e:
-        return {
-            "success": False,
-            "error": str(e),
-            "alternatives": None
-        }
+        return result
 
-# Example usage
+# Simple test
 if __name__ == "__main__":
-    # Example product
-    product = {
-        "title": "Plastic Water Bottle 24-pack",
-        "price": "$12.99",
-        "category": "Kitchen & Dining",
-        "description": "Disposable plastic water bottles"
-    }
+    API_KEY = "I9H1QKABRE05MFZ1FCWVQ2AOY2UMYR74ZA5LE0KZ3B9F1E4109MGYEK80TT51155EK1EGTX3S6RH6O48"
     
-    async def test():
-        result = await find_eco_alternatives(product)
-        print("Result:", result)
+    scraper = ProductScraperTool(api_key=API_KEY)
     
-    asyncio.run(test())
+    test_url = "https://www.amazon.com/dp/B0CP7Q9CVV"
+    
+    result = scraper._run(test_url)
+    print("Scraping Result:")
+    print(f"Title: {result.get('title')}")
+    print(f"Price: {result.get('price')}")
+    print(f"About Item: {result.get('about_item')}")
