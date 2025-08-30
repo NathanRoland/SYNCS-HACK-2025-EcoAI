@@ -33,7 +33,7 @@
         "https://*/*"
     ],
     "side_panel": {
-        "default_path": "sidepanel.html"
+        "default_path": "templates/sidepanel.html"
     },
     "commands": {
       "_execute_action": {

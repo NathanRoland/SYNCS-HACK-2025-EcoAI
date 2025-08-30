@@ -2,6 +2,7 @@ console.log("chat.js");
 
 const chatButton = document.getElementById('chat-button');
 const chatInput = document.getElementById('chat-input');
+const resetChatButton = document.getElementById('reset-chat-button');
 
 chatButton.addEventListener('click', () => {
     const product = chatInput.value;
@@ -16,3 +17,11 @@ chatButton.addEventListener('click', () => {
     chatContainer.innerHTML = response;
     
 });
+
+resetChatButton.addEventListener('click', () => {
+    const chatPrompt = document.getElementById("chat-prompt");
+    chatPrompt.innerHTML = "";
+    const chatContainer = document.getElementById("chat-container");
+    chatContainer.innerHTML = "";
+});
+
