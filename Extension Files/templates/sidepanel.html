@@ -10,30 +10,41 @@
     <p>EcoAI is a browser extension that uses AI to help you find the best sustainable products for your needs.</p>
     <hr>
     <div class="chat-styles-container">
-      <h2>Chat</h2>
-      <button href="chat.html">Expand Chat <i class='fas fa-arrow-right'></i></button>
-      <!-- <a href="chat.html">Chat Expanded</a> -->
+      <div>
+        <h2>Chat</h2>
+        <span id="chat-expanded-container">
+          <a href="chat.html" class="btn"><i class="fas fa-arrow-right"></i>
+          </a>
+        </span>
+      </div>
       <p>Ask EcoAI anything about the product you are looking for. I can help you find sustainable alternatives and provide eco-friendly recommendations.</p>
       
       <div id="chat-prompt"></div>
       <div id="chat-container"></div>
       <input type="text" id="chat-input" placeholder="Provide the product you are looking for">
-      <button id="chat-button">Send</button> <button id="reset-chat-button">Reset Chat</button>
+      <div>
+      <button id="chat-button">Send</button> <button id="reset-chat-button">Reset</button>
+      </div>
       <script src="../scripts/chat.js"></script>
+    </div>
+
+    <hr>
+    <div class="analyse-styles-container">
+      <h2>Product Analysis</h2>
+      <p>Press for a full product analysis on how eco-friendly it is.</p>
+      <button id="analyse-button">Analyse Product</button>
+      <div id="analyse-container"></div>
+      <script src="../scripts/analyse.js"></script>
     </div>
     <hr>
     <div class="similar-styles-container">
       <h2>Analyze Similar Products</h2>
       <p>Provide the product you are looking for and I will analyze similar products and provide you with a list of sustainable alternatives.</p>
-      <button id="similar-button">Analyze</button>
+      <button id="similar-button">Show Similar Products</button>
       <div id="link-container"></div>
       <script src="../scripts/webscrape.js"></script>
-      
       <script src="../scripts/similar.js"></script>
     </div>
     
-    <hr>
-    <button id="settings-button">Settings</button>
-    <script src="../scripts/settings.js"></script>
   </body>
 </html>

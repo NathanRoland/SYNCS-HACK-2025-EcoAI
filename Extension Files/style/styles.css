@@ -1,11 +1,19 @@
 body{
-    background-color: #ffffff;
-    font-family: Verdana, Arial, Tahoma, Serif;
+    /*background-color: #ffffff;*/
+    font-family: Sans-serif;
+
     font-weight: 500;
     font-size: 12px;
-    line-height: 1.6;
-    margin: 0;
+    line-height: 1.0;
+    /*padding: 10px;*/
+
+    background-color: #f2f3f7;
+    width: 100%;
     padding: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    box-sizing: border-box;
 }
 
 .container{
@@ -15,25 +23,160 @@ body{
 }
 
 p{
-    font-family: Verdana, Arial, Tahoma, Serif;
     font-weight: 500;
     font-size: 12px;
     line-height: 1.6;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: calc(100% - 20px);
+    box-sizing: border-box;
+    margin: 0 0 8px 0;
 }
 
-/* Additional styles for better Consolas appearance */
 h1, h2, h3, h4, h5, h6 {
-    font-family: Verdana, Arial, Tahoma, Serif;
     font-weight: 600;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: calc(100% - 20px);
+    box-sizing: border-box;
+    display: inline-block;
+    margin: 0 0 8px 0;
+    line-height: 1.7;
+}
+
+h2{
+    line-height: 1.7;
 }
 
 input, button, textarea {
     font-family: Verdana, Arial, Tahoma, Serif;
     font-size: 12px;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+a {
+    display: inline-block;
+}
+
+#chat-expanded-container{
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+#chat-expanded-container i,
+.btn i {
+    color: #666;
+}
+
+.btn {
+    color: #666;
+    text-decoration: none;
 }
 
 #chat-container, #chat-prompt, #link-container {
     font-family: Verdana, Arial, Tahoma, Serif;
     font-size: 12px;
     line-height: 1.5;
+    padding-right: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+.chat-styles-container, .analyse-styles-container, .similar-styles-container {
+    width: calc(100% - 20px);
+    height: auto;
+    overflow: auto;
+    background-color: white;
+    border-radius: 8px;
+    margin: 2px;
+    padding: 20px;
+    transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+    max-width: calc(100% - 20px);
+    overflow-x: hidden;
+}
+.chat-styles-container:hover, .analyse-styles-container:hover, .similar-styles-container:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+#chat-container{
+    opacity: 0;
+    animation: fadeIn 1s ease-in forwards;    
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+#chat-button{
+    background-color: #00ff1a;
+    border-radius: 5px;
+    border: none;
+    padding: 12px 24px;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 11px;
+    margin-top: 10px;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+#reset-chat-button{
+    background-color: #ff0000;
+    border-radius: 5px;
+    border: none;
+    padding: 12px 24px;
+    margin-top: 10px;
+    font-weight: 600;
+    color: white;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 11px;
+    display: inline-block;
+}
+
+#chat-input{
+    min-width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
+    resize: vertical;
+    min-height: 40px;
+    box-sizing: border-box;
+}
+
+#back-to-sidepanel-container{
+    float: left;
+    margin-top: 20px;
+    margin-right: 10px;
+    color: #666;
+    text-decoration: none;
+}
+
+#analyse-button, #similar-button{
+    background-color: #00ff1a;
+    border-radius: 5px;
+    border: none;
+    padding: 12px 24px;
+    font-weight: 600;
+    color: #000;
+    cursor: pointer;
+    margin-bottom: 10px;
 }
