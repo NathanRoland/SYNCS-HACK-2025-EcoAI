@@ -3,17 +3,21 @@
   <head>
     <title>EcoAI</title>
     <link rel="stylesheet" href="../style/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   </head>
   <body>
-    <a href="sidepanel.html">Back to Sidepanel</a>
+    <span id="back-to-sidepanel-container">
+      <a href="sidepanel.html" class="btn"><i class="fas fa-arrow-left"></i> Back to Sidepanel</a>
+    </span>
     <h1>EcoAI - Chat</h1>
     <p>Ask EcoAI anything about the product you are looking for. I can help you find sustainable alternatives and provide eco-friendly recommendations.</p>
     
     <div id="chat-prompt"></div>
     <div id="chat-container"></div>
     <input type="text" id="chat-input" placeholder="Provide the product you are looking for">
-    <button id="chat-button">Send</button>
-    <button id="reset-chat-button">Reset Chat</button>
+    <div>
+      <button id="chat-button">Send</button> <button id="reset-chat-button">Reset</button>
+    </div>
     <script src="../scripts/chat.js"></script>
   </body>
 </html>
