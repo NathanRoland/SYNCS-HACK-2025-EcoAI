@@ -42,8 +42,7 @@ window.WebScraper = class WebScraper {
             }
         } catch (err) {
         console.error("Error fetching URL:", err);
-        }
-        
+        }   
     }
 
     async amazonScraper(url){
@@ -63,7 +62,7 @@ window.WebScraper = class WebScraper {
         category = (categories[categories.length - 1].textContent || "").trim();
         }
         const reviews = doc.getElementsByClassName("a-size-base a-color-base")[1]?.innerText.trim()+"/5";
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
     }
 
     async ebayScraper(url){
@@ -90,7 +89,7 @@ window.WebScraper = class WebScraper {
         category = (spans[spans.length - 1].textContent || "").trim();
         }
         const reviews = doc.getElementsByClassName("ux-textspans ux-textspans--PSEUDOLINK")[0]?.innerText.trim();
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
 
     }
 
@@ -115,7 +114,7 @@ window.WebScraper = class WebScraper {
             category = (categories[categories.length - 1].textContent || "").trim();
         }
         const reviews = doc.getElementsByClassName("_377jlZDR")[0]?.innerText.trim()+"/5";
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
     }
 
     //update certain descriptions
@@ -161,7 +160,7 @@ window.WebScraper = class WebScraper {
         const reviewsElement = doc.getElementsByClassName("bv_avgRating_component_container notranslate")[0];
         const reviews = reviewsElement ? (reviewsElement.textContent.trim() + "/5") : "N/A";
 
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
     }
 
     //update category and description
@@ -182,7 +181,7 @@ window.WebScraper = class WebScraper {
         const price = doc.getElementsByClassName("sc-bbcf7fe4-3 kAMCuk")[0]?.innerText.trim();
         const category = productName
         const reviews = doc.getElementsByClassName("ml-[0.3125rem] text-xs leading-8 tracking-[0.0125rem] text-grey-charcoal")[0]?.innerText.trim() + "/5";
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
     }
     
     async BingLeeScraper(url){
@@ -199,7 +198,7 @@ window.WebScraper = class WebScraper {
             category = (category_div[category_div.length - 3].textContent || "").trim();
         }
         const reviews = doc.getElementsByClassName("bv-rnr__sc-157rd1w-1 bSVVzx")[0]?.innerText.trim() + "/5";
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
     }
 
     //add description live events
@@ -217,7 +216,7 @@ window.WebScraper = class WebScraper {
             category = (category_div[category_div.length - 1].textContent || "").trim();
         }        
         const reviews = doc.getElementsByClassName("pip-highlight-reviews__header")[0]?.innerText.trim() + "/5";
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
     }
     
     async Mitre10Scraper(url){
@@ -237,7 +236,7 @@ window.WebScraper = class WebScraper {
         }
         const reviews = doc.getElementsByClassName("bv-rnr__sc-157rd1w-1 emgkGJ")[0]?.innerText.trim() + "/5";
         console.log({productName, description, price, category, reviews, url});
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
     }
 
     async harveynormanScraper(url){
@@ -260,7 +259,7 @@ window.WebScraper = class WebScraper {
 
         const reviews = "Null/5";
         console.log({productName, description, price, category, reviews, url});
-        return {"productName": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
+        return {"title": productName, "description": description, "price": price, "category": category, "reviews": reviews, "url": url};
 
     }
 
@@ -268,7 +267,7 @@ window.WebScraper = class WebScraper {
         console.log("scraping generic");
         const names = url.split("/");
         const name = names[names.length - 1];
-        return {"productName": name, "url": url};
+        return {"title": name, "description": "Product from current page", "price": "Unknown", "category": "General", "reviews": "Unknown", "url": url};
     }
 
 }
