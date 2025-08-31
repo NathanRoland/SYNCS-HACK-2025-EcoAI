@@ -39,6 +39,12 @@ Our mission is to empower **individuals, small businesses, and large enterprises
 - **Custom Rules & Permissions** – configure industry-specific rules and manage user access.  
 
 ---
+## Running the project
+- Start the backend server: python main.py
+- Add the browser extension: Navigate to google extensions, ensure developer mode is on and copy the whole Extension Files into the directory
+- Use the browser extension: Either click on the browser extension or click CTRL-B/Command-B and use the extension however you want.
+
+---
 
 ## ✨ Optional Features  
 - **For Consumers:** Eco-score leaderboard, local green product suggestions.  
@@ -57,4 +63,5 @@ Our mission is to empower **individuals, small businesses, and large enterprises
 - **Deployment:** GitHub Pages, Heroku, or Vercel  
 
 ---
+
 
