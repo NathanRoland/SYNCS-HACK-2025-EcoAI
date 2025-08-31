@@ -7,4 +7,4 @@ venv/
 .env
 .pytest_cache/
 .coverage
-htmlcov/
+htmlcov/.env.backup
