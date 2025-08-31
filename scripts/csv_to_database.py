@@ -7,8 +7,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 async def import_csv(csv_file_path):
-    # Connect to database
-    conn = await asyncpg.connect(os.getenv('DATABASE_URL'))
+    # Connect to database with correct credentials
+    database_url = os.getenv('DATABASE_URL', 'postgresql://postgres:newpassword@localhost:5432/syncs')
+    conn = await asyncpg.connect(database_url)
     
     try:
         # Open and read CSV file
@@ -61,7 +62,8 @@ async def import_csv(csv_file_path):
         await conn.close()
 
 async def main():
-    csv_file_path = r"d:\Code\SYNCS_HACK\SYNCS-HACK-2025-EcoAI\scripts\eco_marketplaces_products_ALL.csv"
+    # Use relative path to the CSV file
+    csv_file_path = "eco_marketplaces_products_ALL.csv"
     await import_csv(csv_file_path)
 
 if __name__ == "__main__":

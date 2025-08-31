@@ -21,31 +21,80 @@ class RAGService:
     async def search_similar_products(self, query: str, limit: int = 5) -> List[Dict]:
         try:
             import asyncpg
-            import json
-            import numpy as np
             
-            query_embedding = self.create_embedding(query)
-            conn = await asyncpg.connect(os.getenv("DATABASE_URL"))
+            database_url = os.getenv("DATABASE_URL", "postgresql://postgres:newpassword@localhost:5432/syncs")
+            print(f"Connecting to database: {database_url}")
+            conn = await asyncpg.connect(database_url)
             
+            # First try to find products with embeddings
             results = await conn.fetch("SELECT * FROM products WHERE embedding IS NOT NULL")
-            await conn.close()
             
-            similarities = []
-            for row in results:
-                stored_embedding = json.loads(row['embedding'])
-                similarity = np.dot(query_embedding, stored_embedding)
+            if results:
+                # Use embedding-based search
+                import json
+                import numpy as np
                 
-                similarities.append({
-                    'title': row['title'],
-                    'price': row['price'],
-                    'site': row['site'],
-                    'similarity': similarity
-                })
+                query_embedding = self.create_embedding(query)
+                similarities = []
+                
+                for row in results:
+                    stored_embedding = row['embedding']  # JSONB is already parsed
+                    # Convert to numpy array if it's a string
+                    if isinstance(stored_embedding, str):
+                        stored_embedding = json.loads(stored_embedding)
+                    stored_embedding = np.array(stored_embedding)
+                    similarity = np.dot(query_embedding, stored_embedding)
+                    
+                    similarities.append({
+                        'title': row['title'],
+                        'price': row['price'],
+                        'site': row['site'],
+                        'similarity': similarity
+                    })
+                
+                similarities.sort(key=lambda x: x['similarity'], reverse=True)
+                await conn.close()
+                return similarities[:limit]
+            else:
+                # Fallback: simple text search without embeddings
+                print("No embeddings found, using fallback search")
+                search_terms = query.lower().split()
+                print(f"Search terms: {search_terms}")
+                all_products = await conn.fetch("SELECT * FROM products LIMIT 100")
+                print(f"Found {len(all_products)} products to search through")
+                await conn.close()
+                
+                matches = []
+                for row in all_products:
+                    title = row['title'].lower() if row['title'] else ""
+                    description = row['description'].lower() if row['description'] else ""
+                    categories = row['categories'].lower() if row['categories'] else ""
+                    
+                    # Simple keyword matching
+                    match_score = 0
+                    for term in search_terms:
+                        if term in title:
+                            match_score += 3
+                        if term in description:
+                            match_score += 2
+                        if term in categories:
+                            match_score += 1
+                    
+                    if match_score > 0:
+                        matches.append({
+                            'title': row['title'],
+                            'price': row['price'],
+                            'site': row['site'],
+                            'similarity': match_score
+                        })
+                
+                matches.sort(key=lambda x: x['similarity'], reverse=True)
+                return matches[:limit]
             
-            similarities.sort(key=lambda x: x['similarity'], reverse=True)
-            return similarities[:limit]
-            
-        except:
+        except Exception as e:
+            print(f"Search error: {e}")
+            import traceback
+            traceback.print_exc()
             return []
     
     async def chat(self, question: str) -> Dict[str, str]:
@@ -113,7 +162,7 @@ Answer:"""
             conn = await asyncpg.connect(os.getenv("DATABASE_URL"))
             await conn.execute(
                 "UPDATE products SET embedding = $1 WHERE id = $2",
-                embedding, product_id
+                embedding_str, product_id
             )
             await conn.close()
             
